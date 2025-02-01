@@ -1,0 +1,9 @@
+[package]
+name = "deno-plc-deploy"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+reqwest = "0.12.12"
+tokio = { version = "1.42.0", features = ["rt", "macros", "rt-multi-thread"] }
+urlencoding = "2.1.3"
