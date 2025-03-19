@@ -1,7 +1,27 @@
+/**
+ * @license GPL-3.0-or-later
+ * Deno-PLC Deploy
+ *
+ * Copyright (C) 2024 - 2025 Hans Schallmoser
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 import { z } from "zod";
 import { join, dirname } from "@std/path";
 import { generate_run_id } from "./logs.ts";
 import { getLogger } from "@logtape/logtape";
+import { ensureDir } from "@std/fs/ensure-dir";
 
 const log = getLogger(["deploy", "services"]);
 
@@ -10,7 +30,6 @@ const services_by_name = new Map<string, Service>();
 
 const Manifest = z.object({
     name: z.string(),
-    version: z.string(),
     executable: z.string(),
     args: z.array(z.string()).default([]),
     cwd: z.string().optional(),
@@ -108,8 +127,6 @@ export class Service {
 
 }
 
-
-
 export class ServiceRun {
     readonly run_id = generate_run_id();
     command: Deno.ChildProcess | null = null;
@@ -124,7 +141,7 @@ export class ServiceRun {
 
         const log_dir = join(dirname(manifest_path), manifest.log_dir ?? "logs");
         await Deno.mkdir(log_dir).catch(() => { });
-        this.log_file = await Deno.open(join(log_dir, `run-${this.run_id}.log`), { write: true, create: true, append: true });
+        this.log_file = await Deno.open(join(log_dir, `${this.service.name}-${this.run_id}.log`), { write: true, create: true, append: true });
 
         const local_exec = join(dirname(manifest_path), manifest.executable);
         const executable = await Deno.stat(local_exec).then(() => local_exec).catch(() => manifest.executable);
@@ -193,3 +210,17 @@ export class ServiceRun {
     }
 
 }
+
+
+export async function loadServices() {
+    let count = 0;
+    for await (const entry of Deno.readDir(join(Deno.cwd(), "services"))) {
+        if (entry.isFile && entry.name.endsWith(".service.json")) {
+            await Service.by_path(join(Deno.cwd(), "services", entry.name)).loadManifest();
+            count++;
+        }
+    }
+    log.info`Loaded/updated ${count} service configurations`;
+}
+await ensureDir(join(Deno.cwd(), "services"));
+await loadServices();

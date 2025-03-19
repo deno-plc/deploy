@@ -4,8 +4,12 @@
     "jsr:@hono/hono@^4.6.15": "4.6.15",
     "jsr:@logtape/logtape@0.8": "0.8.0",
     "jsr:@std/assert@^1.0.10": "1.0.10",
+    "jsr:@std/cli@^1.0.14": "1.0.14",
+    "jsr:@std/fs@^1.0.14": "1.0.14",
     "jsr:@std/internal@^1.0.5": "1.0.5",
     "jsr:@std/path@^1.0.8": "1.0.8",
+    "npm:@types/node@*": "22.5.4",
+    "npm:slint-ui@*": "1.9.2",
     "npm:zod@^3.24.1": "3.24.1"
   },
   "jsr": {
@@ -21,6 +25,15 @@
         "jsr:@std/internal"
       ]
     },
+    "@std/cli@1.0.14": {
+      "integrity": "b09ee9921cd476c0e08185ed2bfce682d45ecf4654f26c31b4aa244a2c5c024e"
+    },
+    "@std/fs@1.0.14": {
+      "integrity": "1e84bf0b95fe08f41f1f4aea9717bbf29f45408a56ce073b0114474ce1c9fccf",
+      "dependencies": [
+        "jsr:@std/path"
+      ]
+    },
     "@std/internal@1.0.5": {
       "integrity": "54a546004f769c1ac9e025abd15a76b6671ddc9687e2313b67376125650dc7ba"
     },
@@ -29,6 +42,48 @@
     }
   },
   "npm": {
+    "@napi-rs/cli@2.18.4": {
+      "integrity": "sha512-SgJeA4df9DE2iAEpr3M2H0OKl/yjtg1BnRI5/JyowS71tUWhrfSu2LT0V3vlHET+g1hBVlrO60PmEXwUEKp8Mg=="
+    },
+    "@slint-ui/slint-ui-binary-darwin-arm64@1.9.2": {
+      "integrity": "sha512-nr8BiKVQReYNptn9GCOR4aBdNwm1PzWLBvgb8wNBJ385zBDFdIJzSHTC0bCTDXGgi80Q4g/Ob+sxKzRCO3tCtw=="
+    },
+    "@slint-ui/slint-ui-binary-darwin-x64@1.9.2": {
+      "integrity": "sha512-v2Mex6eGpS0bXwHStsNdwZJoE4r+/Fl2zOgl7EY0bosy5zp45+eEFtHm59ak08djkh+G8o6CKrDADro8bcmxYA=="
+    },
+    "@slint-ui/slint-ui-binary-linux-arm64-gnu@1.9.2": {
+      "integrity": "sha512-m5XUGnFd7IEGXJ3zJlq1D0DaXgcjkDM9mmX3yjqOwGqmStjgF4OQEGfAEDyzipr7rQLF1V8kIfbrQc5+LGlauQ=="
+    },
+    "@slint-ui/slint-ui-binary-linux-x64-gnu@1.9.2": {
+      "integrity": "sha512-UQ6wi6DijgSKhshKntSKbnKU03FSc45/nn6pGyOCzdxhvszgWicWoH8t67vH8k1zl35619E/YcZ7e4gzGCVUCQ=="
+    },
+    "@slint-ui/slint-ui-binary-win32-ia32-msvc@1.9.2": {
+      "integrity": "sha512-IkEi1TujFOsAKNDYjmP1M04noyiR5T/KmJnJMb+M/Q2Zu98mAwZFWRII6v7DTgZhl3TEZievU5idz+MVdtfNig=="
+    },
+    "@slint-ui/slint-ui-binary-win32-x64-msvc@1.9.2": {
+      "integrity": "sha512-eaQ/r1Tnake26Ljp+2eKCzLQJk3TqfLG+rOav3F0Z+2eFeGGAJ+S9pbuGduibDyd5p/Elj28eCL4hJ74TmR+eA=="
+    },
+    "@types/node@22.5.4": {
+      "integrity": "sha512-FDuKUJQm/ju9fT/SeX/6+gBzoPzlVCzfzmGkwKvRHQVxi4BntVbyIwf6a4Xn62mrvndLiml6z/UBXIdEVjQLXg==",
+      "dependencies": [
+        "undici-types"
+      ]
+    },
+    "slint-ui@1.9.2": {
+      "integrity": "sha512-5yf6LQUpJLlv9WR9urRf0hEMov5Hjr4gOA4DZpjvf1YbPz6pVb/evJwhrJ2AiF8YronMQSW2EDMHadfQW4JJRg==",
+      "dependencies": [
+        "@napi-rs/cli",
+        "@slint-ui/slint-ui-binary-darwin-arm64",
+        "@slint-ui/slint-ui-binary-darwin-x64",
+        "@slint-ui/slint-ui-binary-linux-arm64-gnu",
+        "@slint-ui/slint-ui-binary-linux-x64-gnu",
+        "@slint-ui/slint-ui-binary-win32-ia32-msvc",
+        "@slint-ui/slint-ui-binary-win32-x64-msvc"
+      ]
+    },
+    "undici-types@6.19.8": {
+      "integrity": "sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw=="
+    },
     "zod@3.24.1": {
       "integrity": "sha512-muH7gBL9sI1nciMZV67X5fTKKBLtwpZ5VBp1vsOQzj1MhrBZ4wlVCm3gedKZWLp0Oyel8sIGfeiz54Su+OVT+A=="
     }
@@ -38,6 +93,8 @@
       "jsr:@hono/hono@^4.6.15",
       "jsr:@logtape/logtape@0.8",
       "jsr:@std/assert@^1.0.10",
+      "jsr:@std/cli@^1.0.14",
+      "jsr:@std/fs@^1.0.14",
       "jsr:@std/path@^1.0.8",
       "npm:zod@^3.24.1"
     ]
