@@ -6,6 +6,7 @@
         "@logtape/logtape": "jsr:@logtape/logtape@^0.8.0",
         "@std/assert": "jsr:@std/assert@^1.0.10",
         "@std/cli": "jsr:@std/cli@^1.0.14",
+        "@std/encoding": "jsr:@std/encoding@^1.0.7",
         "@std/fs": "jsr:@std/fs@^1.0.14",
         "@std/path": "jsr:@std/path@^1.0.8",
         "hono": "jsr:@hono/hono@^4.6.15",
@@ -15,6 +16,7 @@
         "indentWidth": 4
     },
     "tasks": {
-        "dev": "deno run -A --unstable-kv main.ts --auth-localhost --auth-interactive --no-logfile"
+        "dev": "deno run -A main.ts --auth-localhost --auth-interactive --allow-push --no-logfile",
+        "build": "deno compile -A -o deploy.exe main.ts --auth-localhost --auth-interactive --allow-push"
     }
 }

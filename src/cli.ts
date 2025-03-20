@@ -23,7 +23,10 @@ import { loadServices, Service } from "./services.ts";
 
 const logger = getLogger(["deploy", "cli"]);
 
-export async function exec_cli(str_args: string[], cwd: string): Promise<string> {
+export async function exec_cli(
+    str_args: string[],
+    cwd: string,
+): Promise<string> {
     logger.info`Execute CLI: ${str_args} in ${cwd}`;
 
     const verb = str_args.shift();
@@ -38,8 +41,8 @@ export async function exec_cli(str_args: string[], cwd: string): Promise<string>
 }
 
 async function* exec_core(verb: string, args: Args, _cwd: string) {
-    yield `Deno-PLC Deploy Copyright (C) 2024 - 2025 Hans Schallmoser
-This program comes with ABSOLUTELY NO WARRANTY; for details type 'about'.`;
+    //     yield `Deno-PLC Deploy Copyright (C) 2024 - 2025 Hans Schallmoser
+    // This program comes with ABSOLUTELY NO WARRANTY; for details type 'about'.`;
     switch (verb) {
         case "reload":
             await loadServices();
@@ -65,8 +68,8 @@ This program comes with ABSOLUTELY NO WARRANTY; for details type 'about'.`;
                     if (service.status === "running") {
                         await service.stop();
                     }
-                    yield `All services stopped`;
                 }
+                yield `All services stopped`;
             } else {
                 const service = Service.by_name(name);
                 if (service) {

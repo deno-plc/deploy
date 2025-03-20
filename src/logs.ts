@@ -17,7 +17,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { configure, getConsoleSink, getFileSink, getLogger, type Sink } from "@logtape/logtape";
+import {
+    configure,
+    getConsoleSink,
+    getFileSink,
+    getLogger,
+    type Sink,
+} from "@logtape/logtape";
 import { join } from "@std/path";
 import { ensureDir } from "@std/fs";
 import { NO_LOGFILE } from "./self-config.ts";
@@ -56,12 +62,14 @@ async function file_sink() {
 const all_sinks = NO_LOGFILE ? ["console"] : ["console", "file"];
 
 await configure({
-    sinks: NO_LOGFILE ? {
-        console: getConsoleSink(),
-    } : {
-        console: getConsoleSink(),
-        file: await file_sink()
-    } as Record<string, Sink>,
+    sinks: NO_LOGFILE
+        ? {
+            console: getConsoleSink(),
+        }
+        : {
+            console: getConsoleSink(),
+            file: await file_sink(),
+        } as Record<string, Sink>,
     loggers: [
         {
             category: ["deploy"],
@@ -72,15 +80,15 @@ await configure({
             category: ["logtape", "meta"],
             lowestLevel: "warning",
             sinks: all_sinks,
-        }
-    ]
+        },
+    ],
 });
 
 const log = getLogger(["deploy", "self"]);
 
 log.info(`Deploy-Host run ID: ${run_id}`);
 
-addEventListener("unhandledrejection", e => {
+addEventListener("unhandledrejection", (e) => {
     log.fatal`Unhandled rejection: ${e}`;
     throw e;
 });

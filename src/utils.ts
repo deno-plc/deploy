@@ -2,7 +2,7 @@
  * @license GPL-3.0-or-later
  * Deno-PLC Deploy
  *
- * Copyright (C) 2024 - 2025 Hans Schallmoser
+ * Copyright (C) 2025 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { parseArgs } from "@std/cli/parse-args";
+import { assert } from "@std/assert/assert";
+import { decodeBase64Url, encodeBase64Url } from "@std/encoding/base64url";
 
-const args = parseArgs(Deno.args);
-
-export const ALLOW_LOCALHOST_AUTH = Boolean(args["auth-localhost"] ?? false);
-export const ALLOW_INTERACTIVE_AUTH = Boolean(
-    args["auth-interactive"] ?? false,
-);
-export const ALLOW_PUSH = Boolean(args["allow-push"] ?? false);
-export const NO_LOGFILE = Boolean(args["no-logfile"] ?? false);
-export const STARTUP_EVAL = String(args["eval"] ?? "");
+export function assert_sha256_hash(h: string) {
+    const blob_hash = decodeBase64Url(h);
+    assert(blob_hash.length === 32);
+    const hash = encodeBase64Url(blob_hash);
+    assert(hash.length === 43);
+    assert(hash === h);
+}

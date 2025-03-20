@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { z } from "zod";
-import { join, dirname } from "@std/path";
+import { dirname, join } from "@std/path";
 import { generate_run_id } from "./logs.ts";
 import { getLogger } from "@logtape/logtape";
 import { ensureDir } from "@std/fs/ensure-dir";
@@ -45,7 +45,8 @@ export class Service {
     }
 
     static by_path(manifest_path: string) {
-        return services_by_path.get(manifest_path) ?? new Service(manifest_path);
+        return services_by_path.get(manifest_path) ??
+            new Service(manifest_path);
     }
 
     static by_name(name: string) {
@@ -70,7 +71,8 @@ export class Service {
 
     last_manifest: Manifest | Promise<Manifest> = this.loadManifest();
 
-    last_manifest_content = `manifest has not loaded yet ${crypto.randomUUID()}`;
+    last_manifest_content =
+        `manifest has not loaded yet ${crypto.randomUUID()}`;
 
     async loadManifest(): Promise<Manifest> {
         const content = await Deno.readTextFile(this.manifest_path);
@@ -124,7 +126,6 @@ export class Service {
         await this.start();
         log.info`Service ${this.name} restarted`;
     }
-
 }
 
 export class ServiceRun {
@@ -132,19 +133,24 @@ export class ServiceRun {
     command: Deno.ChildProcess | null = null;
     log_file: Deno.FsFile | null = null;
     constructor(readonly service: Service, readonly manifest: Manifest) {
-
     }
 
     async run() {
         const { manifest, service } = this;
         const { manifest_path } = service;
 
-        const log_dir = join(dirname(manifest_path), manifest.log_dir ?? "logs");
-        await Deno.mkdir(log_dir).catch(() => { });
-        this.log_file = await Deno.open(join(log_dir, `${this.service.name}-${this.run_id}.log`), { write: true, create: true, append: true });
+        const log_dir = manifest.log_dir
+            ? join(dirname(manifest_path), manifest.log_dir)
+            : join(Deno.cwd(), "services/logs");
+        await Deno.mkdir(log_dir).catch(() => {});
+        this.log_file = await Deno.open(
+            join(log_dir, `${this.service.name}-${this.run_id}.log`),
+            { write: true, create: true, append: true },
+        );
 
         const local_exec = join(dirname(manifest_path), manifest.executable);
-        const executable = await Deno.stat(local_exec).then(() => local_exec).catch(() => manifest.executable);
+        const executable = await Deno.stat(local_exec).then(() => local_exec)
+            .catch(() => manifest.executable);
 
         await this.log_file.write(new TextEncoder().encode(`
     run ID: ${this.run_id}
@@ -169,18 +175,20 @@ export class ServiceRun {
     }
 
     async run_long() {
-        await Promise.all([this.command!.stdout, this.command!.stderr].map(async (stream) => {
-            const reader = stream.getReader();
-            let done = false;
-            while (!done) {
-                const { value, done: streamDone } = await reader.read();
-                if (streamDone) {
-                    done = true;
-                } else {
-                    await this.log_file!.write(value);
+        await Promise.all(
+            [this.command!.stdout, this.command!.stderr].map(async (stream) => {
+                const reader = stream.getReader();
+                let done = false;
+                while (!done) {
+                    const { value, done: streamDone } = await reader.read();
+                    if (streamDone) {
+                        done = true;
+                    } else {
+                        await this.log_file!.write(value);
+                    }
                 }
-            }
-        }));
+            }),
+        );
 
         if (!this.requested_exit) {
             log.error`Service ${this.service.name} exited unexpectedly`;
@@ -208,19 +216,18 @@ export class ServiceRun {
         this.command?.kill();
         await this.finished;
     }
-
 }
-
 
 export async function loadServices() {
     let count = 0;
-    for await (const entry of Deno.readDir(join(Deno.cwd(), "services"))) {
+    for await (const entry of Deno.readDir(join(Deno.cwd(), "services/data"))) {
         if (entry.isFile && entry.name.endsWith(".service.json")) {
-            await Service.by_path(join(Deno.cwd(), "services", entry.name)).loadManifest();
+            await Service.by_path(join(Deno.cwd(), "services/data", entry.name))
+                .loadManifest();
             count++;
         }
     }
     log.info`Loaded/updated ${count} service configurations`;
 }
-await ensureDir(join(Deno.cwd(), "services"));
+await ensureDir(join(Deno.cwd(), "services/data"));
 await loadServices();
