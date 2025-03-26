@@ -35,6 +35,7 @@ import { InteractiveAuth } from "./src/interactive_auth.ts";
 import { decodeBase64Url, encodeBase64Url } from "@std/encoding/base64url";
 import { authorized_hashes, push_server } from "./src/push_server.ts";
 import { join } from "@std/path";
+import { ensureFile } from "@std/fs/ensure-file";
 
 const log = getLogger(["deploy", "main"]);
 
@@ -128,11 +129,14 @@ if (STARTUP_EVAL) {
 }
 
 try {
+    await ensureFile(join(Deno.cwd(), "services/startup.json"));
     const startup_json = JSON.parse(
-        await Deno.readTextFile(join(Deno.cwd(), "services/startup.json")),
+        await Deno.readTextFile(join(Deno.cwd(), "services/startup.json")) ?? "{}",
     );
-    for (const { cmd } of startup_json.startup) {
-        await exec_cli(cmd, join(Deno.cwd(), "services"));
+    if (startup_json.startup) {
+        for (const { cmd } of startup_json.startup) {
+            await exec_cli(cmd, join(Deno.cwd(), "services"));
+        }
     }
 } catch (e) {
     log.error`Failed to execute startup.json: ${e}`;
